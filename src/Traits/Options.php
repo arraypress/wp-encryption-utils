@@ -178,5 +178,4 @@ trait Options {
 			'is_encrypted' => false,
 		];
 	}
-
 }

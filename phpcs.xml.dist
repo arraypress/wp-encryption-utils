@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<ruleset name="wp-encryption-utils">
+    <description>
+        The WordPress sniffs worth enforcing here.
+
+        Deliberately not the full WordPress standard: most of what that adds is
+        formatting this codebase consistently does differently, short array
+        syntax above all. A wall of noise nobody reads is how a real finding
+        gets lost. What is left is the part that catches defects rather than
+        preferences.
+    </description>
+
+    <file>src</file>
+    <arg name="extensions" value="php"/>
+    <arg name="basepath" value="."/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <rule ref="WordPress.Security"/>
+    <rule ref="WordPress.DB"/>
+    <rule ref="WordPress.WP.I18n"/>
+    <!-- Every translatable string in this package uses this domain. -->
+    <config name="text_domain" value="arraypress"/>
+
+    <rule ref="PHPCompatibilityWP"/>
+    <config name="testVersion" value="8.2-"/>
+</ruleset>

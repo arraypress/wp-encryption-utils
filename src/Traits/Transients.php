@@ -58,5 +58,4 @@ trait Transients {
 
 		return $decrypted;
 	}
-
 }

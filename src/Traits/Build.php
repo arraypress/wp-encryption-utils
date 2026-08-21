@@ -58,5 +58,4 @@ trait Build {
 	private function build_filter_hook( string $option_name ): string {
 		return "pre_option_{$option_name}";
 	}
-
 }

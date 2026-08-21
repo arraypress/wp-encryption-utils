@@ -233,7 +233,7 @@ trait Core {
 	 */
 	public function is_legacy_format( string $value ): bool {
 		return $this->is_encrypted( $value )
-		       && ! str_starts_with( substr( $value, strlen( $this->prefix ) ), $this->format_marker );
+				&& ! str_starts_with( substr( $value, strlen( $this->prefix ) ), $this->format_marker );
 	}
 
 	/**
@@ -292,8 +292,10 @@ trait Core {
 		$available = openssl_get_cipher_methods();
 
 		if ( ! in_array( $this->algorithm, $available, true ) ) {
+			// Not output: an exception message, which reaches a log or an
+			// error handler that escapes it there.
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new RuntimeException( "Encryption algorithm '{$this->algorithm}' is not supported" );
 		}
 	}
-
 }

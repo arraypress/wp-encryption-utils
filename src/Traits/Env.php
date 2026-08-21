@@ -131,5 +131,4 @@ trait Env {
 	public function is_externally_defined( string $option ): bool {
 		return $this->has_constant_for_option( $option ) || $this->has_env_for_option( $option );
 	}
-
 }

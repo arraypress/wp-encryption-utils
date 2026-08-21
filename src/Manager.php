@@ -63,5 +63,4 @@ class Manager {
 			$this->setup_auto_interception();
 		}
 	}
-
 }

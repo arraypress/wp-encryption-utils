@@ -116,5 +116,4 @@ trait Constants {
 
 		return $base_desc . ' ' . __( '(stored encrypted in database)', 'arraypress' );
 	}
-
 }

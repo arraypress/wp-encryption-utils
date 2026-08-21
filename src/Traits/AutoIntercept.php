@@ -124,5 +124,4 @@ trait AutoIntercept {
 	public function is_auto_intercept_enabled(): bool {
 		return $this->auto_intercept;
 	}
-
 }

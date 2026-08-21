@@ -60,5 +60,4 @@ trait UserMeta {
 
 		return $decrypted;
 	}
-
 }
