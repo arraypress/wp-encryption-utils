@@ -40,8 +40,10 @@ trait Options {
 	 * @return bool Whether the option was updated successfully
 	 */
 	public function update_option( string $option, string $value ): bool {
-		// Don't save to database if constant is defined
-		if ( $this->has_constant_for_option( $option ) ) {
+		// Don't save to the database when the value is fixed by configuration:
+		// the write would succeed but get_option() would keep returning the
+		// constant or environment value, which reads as data loss.
+		if ( $this->is_externally_defined( $option ) ) {
 			return false;
 		}
 
@@ -72,10 +74,18 @@ trait Options {
 	 * @return string Decrypted option value or default if error
 	 */
 	public function get_option( string $option, string $default = '' ): string {
-		// Check constant first
+		// Precedence: constant, then environment variable, then the encrypted
+		// database option. Constants win because they are explicit and local to
+		// the site; env is the fallback for hosts where wp-config.php cannot be
+		// written.
 		$constant_value = $this->get_constant_for_option( $option );
 		if ( $constant_value !== null ) {
 			return $constant_value;
+		}
+
+		$env_value = $this->get_env_for_option( $option );
+		if ( $env_value !== null ) {
+			return $env_value;
 		}
 
 		// Fall back to database option
@@ -106,7 +116,7 @@ trait Options {
 	 * @return bool Whether the option was deleted successfully
 	 */
 	public function delete_option( string $option, bool $force = false ): bool {
-		if ( ! $force && $this->has_constant_for_option( $option ) ) {
+		if ( ! $force && $this->is_externally_defined( $option ) ) {
 			return false;
 		}
 
@@ -131,6 +141,17 @@ trait Options {
 				'value'        => $constant_value,
 				'source'       => 'constant',
 				'constant'     => $this->option_to_constant( $option ),
+				'is_encrypted' => false,
+			];
+		}
+
+		// Check environment variable
+		$env_value = $this->get_env_for_option( $option );
+		if ( $env_value !== null ) {
+			return [
+				'value'        => $env_value,
+				'source'       => 'env',
+				'env'          => $this->option_to_env( $option ),
 				'is_encrypted' => false,
 			];
 		}

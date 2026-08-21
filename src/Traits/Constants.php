@@ -97,12 +97,20 @@ trait Constants {
 	 */
 	public function get_setting_description( string $option, string $base_desc ): string {
 		if ( $this->is_constant_defined( $option ) ) {
-			$constant_name = $this->get_constant_name( $option );
-
 			return $base_desc . sprintf(
 					' <strong>%s</strong> <code>%s</code>',
 					__( 'Defined as constant:', 'arraypress' ),
-					$constant_name
+					$this->get_constant_name( $option )
+				);
+		}
+
+		// Say so when an environment variable is supplying the value, otherwise
+		// the field looks editable while saves silently do nothing.
+		if ( $this->is_env_defined( $option ) ) {
+			return $base_desc . sprintf(
+					' <strong>%s</strong> <code>%s</code>',
+					__( 'Defined as environment variable:', 'arraypress' ),
+					$this->get_env_name( $option )
 				);
 		}
 

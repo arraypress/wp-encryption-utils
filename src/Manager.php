@@ -17,6 +17,7 @@ use ArrayPress\EncryptionUtils\Traits\{
 	Build,
 	Core,
 	Constants,
+	Env,
 	Options,
 	AutoIntercept,
 	Transients,
@@ -36,6 +37,7 @@ class Manager {
 	use Build;
 	use Core;
 	use Constants;
+	use Env;
 	use Options;
 	use AutoIntercept;
 	use Transients;

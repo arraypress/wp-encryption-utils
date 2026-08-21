@@ -11,6 +11,7 @@ A lightweight utility library for WordPress that provides authenticated encrypti
 * 🔍 **Prefix Detection**: Automatically detects encrypted values
 * 🔄 **Custom Keys**: Support for custom encryption keys
 * 📋 **Constants Support**: Automatically checks for WordPress constants before database storage
+* 🌍 **Environment Variables**: Falls back to env vars for container and platform hosting
 * 🎯 **Auto-Interception**: Transparent decryption of get_option() calls
 
 ## Requirements
@@ -282,3 +283,41 @@ Licensed under the GPLv2 or later license.
 ## Support
 
 - [Issue Tracker](https://github.com/arraypress/wp-encryption/issues)
+## Configuration Sources
+
+Values are resolved in a fixed order:
+
+1. **A PHP constant** — `define( 'WC_R2_ACCOUNT_ID', '...' )` in `wp-config.php`
+2. **An environment variable** — `WC_R2_ACCOUNT_ID`
+3. **The encrypted database option**
+
+Constants come first deliberately. They are explicit, local to the site, and
+cannot be read out of the process environment. Environment variables exist for
+hosts where writing `wp-config.php` is not an option — containers, Kubernetes,
+Platform.sh, Pantheon, and most CI pipelines — but they are more readily
+exposed by `phpinfo()`, a stack trace, or a debugging plugin, so they sit below
+constants rather than above them.
+
+When either a constant or an environment variable supplies a value,
+`update_option()` and `delete_option()` refuse to write. The write would
+otherwise appear to succeed while `get_option()` kept returning the external
+value, which is indistinguishable from data loss. Use `is_externally_defined()`
+to render such fields read-only, and `get_setting_description()` to tell the
+admin which constant or variable is in play.
+
+### PHP-FPM: `clear_env`
+
+If an environment variable appears to be ignored, this is almost always why.
+PHP-FPM pools default to `clear_env = yes`, which wipes the environment before
+workers start — so variables exported in a shell, a Dockerfile, or a systemd
+unit never reach PHP. Either pass them through explicitly:
+
+```ini
+env[WC_R2_ACCOUNT_ID] = $WC_R2_ACCOUNT_ID
+```
+
+or set `clear_env = no` in the pool configuration.
+
+Values are read with `getenv()` rather than `$_ENV`, because PHP's
+`variables_order` defaults to `"GPCS"` — no `E` — leaving `$_ENV` empty on most
+stock installations.
