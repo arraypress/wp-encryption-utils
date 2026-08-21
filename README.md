@@ -1,11 +1,11 @@
 # WordPress Encryption Utilities - Secure Storage for Sensitive Data
 
-A lightweight utility library for WordPress that provides secure encryption and decryption of sensitive data stored in options, transients, and meta tables. Perfect for protecting API keys, passwords, and tokens in your WordPress applications.
+A lightweight utility library for WordPress that provides authenticated encryption and decryption of sensitive data stored in options, transients, and meta tables. Perfect for protecting API keys, passwords, and tokens in your WordPress applications.
 
 ## Features
 
 * 🔐 **Simple API**: Clean object-oriented interface with trait-based architecture
-* 🛡️ **AES-256 Encryption**: Industry-standard encryption for maximum security
+* 🛡️ **AES-256-GCM**: Authenticated encryption — tampering with stored ciphertext is detected, not silently decrypted
 * 🔑 **WordPress Integration**: Seamlessly works with WordPress options, transients, and meta
 * 🧩 **Automatic Salt Detection**: Uses WordPress salts for enhanced security
 * 🔍 **Prefix Detection**: Automatically detects encrypted values
@@ -233,8 +233,13 @@ class MyWooCommercePlugin {
 
 This library:
 
-* Uses industry-standard AES-256-CBC encryption
-* Automatically generates secure random IVs for each encryption
+* Uses AES-256-GCM, an *authenticated* cipher: ciphertext that has been
+  altered in the database fails to decrypt rather than silently yielding
+  attacker-influenced plaintext
+* Automatically generates a fresh random IV for each encryption
+* Reads values written by <= 1.0.0 (unauthenticated AES-256-CBC) so upgrades
+  are seamless; re-saving a value rewrites it in the authenticated format.
+  `is_legacy_format()` identifies values still needing that migration
 * Uses WordPress salts and auth keys for enhanced security by default
 * Validates that the OpenSSL extension is available
 * Returns WordPress-style error responses for graceful failure handling
