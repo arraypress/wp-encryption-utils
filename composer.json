@@ -1,6 +1,5 @@
 {
   "name": "arraypress/wp-encryption-utils",
-  "version": "1.2.0",
   "description": "A simple utility library for encrypting and decrypting WordPress data including options, settings, meta, and transients.",
   "type": "library",
   "license": "GPL-2.0-or-later",
